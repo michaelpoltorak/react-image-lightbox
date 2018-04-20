@@ -1,3 +1,5 @@
+// @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+
 $toolbarHeight: 50px;
 $maxCaptionHeight: 150px;
 
@@ -11,7 +13,8 @@ $maxCaptionHeight: 150px;
 }
 
 .outer {
-  background-color: rgba(0, 0, 0, 0.85);
+  // background-color: rgba(0, 0, 0, 0.85);
+  background-color: black;
   outline: none;
   top: 0;
   left: 0;
@@ -40,6 +43,7 @@ $maxCaptionHeight: 150px;
 
 .image {
   position: absolute;
+  // max-width: 1200px;
   top: 0;
   right: 0;
   bottom: 0;
@@ -230,6 +234,13 @@ $maxCaptionHeight: 150px;
     no-repeat center;
 }
 
+.rotate_left {
+  color: green;
+}
+
+.ril-rotate_left {
+  color: white;
+}
 .outerAnimating {
   animation-name: closeWindow;
 }
@@ -329,4 +340,16 @@ $maxCaptionHeight: 150px;
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
+}
+
+.comments {
+  position: absolute;
+  right: 5%;
+  top: 10%;
+  background: red;
+  color: white;
+  z-index: 11111;
+  width: 200px;
+  height: 200px;
+  padding: 5px;
 }

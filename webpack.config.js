@@ -96,8 +96,9 @@ switch (target) {
     });
     config.entry = ['react-hot-loader/patch', './examples/cats/index'];
     config.output = {
-      path: path.join(__dirname, 'build'),
-      filename: 'static/[name].js',
+      path: path.join(__dirname, 'dist'),
+      //filename: 'static/[name].js',
+      filename: 'dist/main.js',
     };
     config.plugins = [
       new HtmlWebpackPlugin({

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+// import Lightbox from '../../src/foo';
 import Lightbox from '../../src/react-image-lightbox';
+// import Lightbox from '../../dist/main.js';
 import styles from './stylesheets/app.scss';
 import image1 from './images/1.jpg';
 import image2 from './images/2.jpg';
@@ -65,7 +67,7 @@ const titles = [
 ];
 
 const captions = [
-  'Cat in the snow',
+  'Cat in the snow!',
   '',
   <p>
     .. not in the&nbsp;

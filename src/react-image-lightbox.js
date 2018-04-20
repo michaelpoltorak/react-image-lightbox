@@ -1100,6 +1100,13 @@ class ReactImageLightbox extends Component {
     this.changeZoom(this.state.zoomLevel - ZOOM_BUTTON_INCREMENT_SIZE);
   }
 
+  handleRotateLeft() {
+    const el: any = document.getElementsByClassName('ril-image-current')[0]; // FIXME: this is a hack to get the current lightbox image
+    const angle = (this.state.rotationAngle + 90) % 360;
+    this.setState({ rotationAngle: angle });
+    el.style.transform = `rotate(${angle}deg)`;
+  }
+
   handleCaptionMousewheel(event) {
     event.stopPropagation();
 
@@ -1280,6 +1287,7 @@ class ReactImageLightbox extends Component {
   }
 
   render() {
+    console.log('this.props.comments ', this.props.comments);
     const {
       animationDisabled,
       animationDuration,
@@ -1323,7 +1331,7 @@ class ReactImageLightbox extends Component {
     // Images to be displayed
     const images = [];
     const addImage = (srcType, imageClass, transforms) => {
-      // Ignore types that have no source defined for their full size image
+      // Ignore types that have no source defined for tx$heir full size image
       if (!this.props[srcType]) {
         return;
       }
@@ -1469,7 +1477,6 @@ class ReactImageLightbox extends Component {
         ...reactModalStyle.content, // Allow style overrides via props
       },
     };
-
     return (
       <Modal
         isOpen
@@ -1519,6 +1526,7 @@ class ReactImageLightbox extends Component {
             onClick={clickOutsideToClose ? this.closeIfClickInner : undefined}
           >
             {images}
+            <div className='ril__comments'>{this.props.comments.writeComment}</div>
           </div>
 
           {prevSrc && (
@@ -1634,7 +1642,16 @@ class ReactImageLightbox extends Component {
                   />
                 </li>
               )}
-
+              
+              {/* <li className={`ril-toolbar__item ril-toolbar__item`}>
+                <button // Lightbox zoom out button
+                  type="button"
+                  key="zoom-out"
+                  aria-label={this.props.zoomOutLabel}
+                  className={`ril-zoom-out ${zoomOutButtonClasses.join(' ')}`}
+                  onClick={zoomOutButtonHandler}
+                />
+              </li> */}
               <li className={`ril-toolbar__item ${styles.toolbarItem}`}>
                 <button // Lightbox close button
                   type="button"
@@ -1649,6 +1666,7 @@ class ReactImageLightbox extends Component {
                   onClick={!this.isAnimating() ? this.requestClose : undefined} // Ignore clicks during animation
                 />
               </li>
+              
             </ul>
           </div>
 
