@@ -38,10 +38,10 @@ if (ieVersion < 10) {
     toolbarSide: `${styles.toolbarSide} ${styles.toolbarSideNoFlex}`,
     toolbarLeftSide: `${styles.toolbarLeftSide} ${
       styles.toolbarLeftSideNoFlex
-    }`,
+      }`,
     toolbarRightSide: `${styles.toolbarRightSide} ${
       styles.toolbarRightSideNoFlex
-    }`,
+      }`,
   };
 }
 
@@ -90,8 +90,8 @@ class ReactImageLightbox extends Component {
     return isOldIE
       ? { msTransform: `translate(${nextX}px,${y}px) scale(${scaleFactor})` }
       : {
-          transform: `translate3d(${nextX}px,${y}px,0) scale3d(${scaleFactor},${scaleFactor},1)`,
-        };
+        transform: `translate3d(${nextX}px,${y}px,0) scale3d(${scaleFactor},${scaleFactor},1)`,
+      };
   }
 
   static loadStyles() {
@@ -104,7 +104,7 @@ class ReactImageLightbox extends Component {
 
   constructor(props) {
     super(props);
-
+    // console.log('RIL props ', props);
     this.state = {
       //-----------------------------
       // Animation
@@ -134,6 +134,7 @@ class ReactImageLightbox extends Component {
 
       // image load error for srcType
       loadErrorStatus: {},
+      comments: [],
     };
 
     this.closeIfClickInner = this.closeIfClickInner.bind(this);
@@ -222,7 +223,6 @@ class ReactImageLightbox extends Component {
 
   componentDidMount() {
     ReactImageLightbox.loadStyles();
-
     // Prevents cross-origin errors when using a cross-origin iframe
     this.windowContext = getHighestSafeWindowContext();
 
@@ -269,7 +269,13 @@ class ReactImageLightbox extends Component {
       this.moveRequested = false;
 
       // Load any new images
+      console.log('LB next image', nextProps.mainSrc)
+      console.log('LB current image', this.props.mainSrc)
+      //this.props.comments.commentsList(nextProps.mainSrc);
       this.loadAllImages(nextProps);
+      if (this.props.mainSrc !== nextProps.mainSrc) {
+        this.loadComments(nextProps);
+      }
     }
   }
 
@@ -586,7 +592,7 @@ class ReactImageLightbox extends Component {
     const currentTime = new Date();
     if (
       currentTime.getTime() - this.lastKeyDownTime <
-        this.props.keyRepeatLimit &&
+      this.props.keyRepeatLimit &&
       keyCode !== KEYS.ESC
     ) {
       return;
@@ -1180,6 +1186,13 @@ class ReactImageLightbox extends Component {
     inMemoryImage.src = imageSrc;
   }
 
+  loadComments(props) {
+    const comments = props.comments.getCommentsByDefectImage(props.comments.comments, props.item.id, props.mainSrc);
+    this.setState({ comments });
+    // console.log('Image comments ', comments);
+    console.log('load comments for image ', props.mainSrc);
+    this.props.comments.setCurrentImage(props.mainSrc);
+  }
   // Load all images and their thumbnails
   loadAllImages(props = this.props) {
     const generateLoadDoneCallback = (srcType, imageSrc) => err => {
@@ -1287,7 +1300,13 @@ class ReactImageLightbox extends Component {
   }
 
   render() {
-    console.log('this.props.comments ', this.props.comments);
+    // console.log('this.props.comments ', this.props);
+    //  const commentsLB = { imageComment: ImageComment, comments: this.state.commentsData, writeComment, 
+    // getCommentsByDefectImage: util.getCommentsByDefectImage, addComment: this.props.addComment };
+    // const commentsByImage = this.props.comments.getCommentsByDefectImage(this.props.comments.comments, this.props.item.id, this.props.mainSrc);
+    const commentsByImage = this.state.comments || [];
+    const ImageComment = this.props.comments.imageComment({ comments: commentsByImage, id: this.props.item.id, imageUrl: this.props.mainSrc });
+    // const WriteComment = this.props.comments.writeComment({id: this.props.item.id, showModal: false, title: 'Foo', type: 'defect'});
     const {
       animationDisabled,
       animationDuration,
@@ -1375,22 +1394,22 @@ class ReactImageLightbox extends Component {
               {translate('Loading...')}
             </div>
           ) : (
-            <div
-              className={`ril-loading-circle ${styles.loadingCircle} ${
-                styles.loadingContainer__icon
-              }`}
-            >
-              {[...new Array(12)].map((_, index) => (
-                <div
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  className={`ril-loading-circle-point ${
-                    styles.loadingCirclePoint
+              <div
+                className={`ril-loading-circle ${styles.loadingCircle} ${
+                  styles.loadingContainer__icon
                   }`}
-                />
-              ))}
-            </div>
-          );
+              >
+                {[...new Array(12)].map((_, index) => (
+                  <div
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    className={`ril-loading-circle-point ${
+                      styles.loadingCirclePoint
+                      }`}
+                  />
+                ))}
+              </div>
+            );
 
         // Fall back to loading icon if the thumbnail has not been loaded
         images.push(
@@ -1413,7 +1432,7 @@ class ReactImageLightbox extends Component {
           <div
             className={`${imageClass} ${styles.image} ${
               styles.imageDiscourager
-            }`}
+              }`}
             onDoubleClick={this.handleImageDoubleClick}
             onWheel={this.handleImageMouseWheel}
             style={imageStyle}
@@ -1477,6 +1496,7 @@ class ReactImageLightbox extends Component {
         ...reactModalStyle.content, // Allow style overrides via props
       },
     };
+    // const ImageComment = this.props.comments.imageComment({imageId: this.props.mainSrc});
     return (
       <Modal
         isOpen
@@ -1502,7 +1522,7 @@ class ReactImageLightbox extends Component {
           // Floating modal with closing animations
           className={`ril-outer ${styles.outer} ${styles.outerAnimating} ${
             this.props.wrapperClassName
-          } ${isClosing ? `ril-closing ${styles.outerClosing}` : ''}`}
+            } ${isClosing ? `ril-closing ${styles.outerClosing}` : ''}`}
           style={{
             transition: `opacity ${animationDuration}ms`,
             animationDuration: `${animationDuration}ms`,
@@ -1526,7 +1546,7 @@ class ReactImageLightbox extends Component {
             onClick={clickOutsideToClose ? this.closeIfClickInner : undefined}
           >
             {images}
-            <div className='ril__comments'>{this.props.comments.writeComment}</div>
+            <div className='ril__comments'>{ImageComment}</div>
           </div>
 
           {prevSrc && (
@@ -1534,7 +1554,7 @@ class ReactImageLightbox extends Component {
               type="button"
               className={`ril-prev-button ${styles.navButtons} ${
                 styles.navButtonPrev
-              }`}
+                }`}
               key="prev"
               aria-label={this.props.prevLabel}
               onClick={!this.isAnimating() ? this.requestMovePrev : undefined} // Ignore clicks during animation
@@ -1546,7 +1566,7 @@ class ReactImageLightbox extends Component {
               type="button"
               className={`ril-next-button ${styles.navButtons} ${
                 styles.navButtonNext
-              }`}
+                }`}
               key="next"
               aria-label={this.props.nextLabel}
               onClick={!this.isAnimating() ? this.requestMoveNext : undefined} // Ignore clicks during animation
@@ -1559,13 +1579,13 @@ class ReactImageLightbox extends Component {
             <ul
               className={`ril-toolbar-left ${styles.toolbarSide} ${
                 styles.toolbarLeftSide
-              }`}
+                }`}
             >
               <li className={`ril-toolbar__item ${styles.toolbarItem}`}>
                 <span
                   className={`ril-toolbar__item__child ${
                     styles.toolbarItemChild
-                  }`}
+                    }`}
                 >
                   {imageTitle}
                 </span>
@@ -1642,7 +1662,7 @@ class ReactImageLightbox extends Component {
                   />
                 </li>
               )}
-              
+
               {/* <li className={`ril-toolbar__item ril-toolbar__item`}>
                 <button // Lightbox zoom out button
                   type="button"
@@ -1660,13 +1680,13 @@ class ReactImageLightbox extends Component {
                   className={
                     'ril-close ril-toolbar__item__child' +
                     ` ${styles.toolbarItemChild} ${styles.builtinButton} ${
-                      styles.closeButton
+                    styles.closeButton
                     }`
                   }
                   onClick={!this.isAnimating() ? this.requestClose : undefined} // Ignore clicks during animation
                 />
               </li>
-              
+
             </ul>
           </div>
 
@@ -1851,11 +1871,11 @@ ReactImageLightbox.defaultProps = {
   nextLabel: 'Next image',
   nextSrc: null,
   nextSrcThumbnail: null,
-  onAfterOpen: () => {},
-  onImageLoadError: () => {},
-  onImageLoad: () => {},
-  onMoveNextRequest: () => {},
-  onMovePrevRequest: () => {},
+  onAfterOpen: () => { },
+  onImageLoadError: () => { },
+  onImageLoad: () => { },
+  onMoveNextRequest: () => { },
+  onMovePrevRequest: () => { },
   prevLabel: 'Previous image',
   prevSrc: null,
   prevSrcThumbnail: null,

@@ -342,7 +342,7 @@ $maxCaptionHeight: 150px;
   transform: translateX(-50%) translateY(-50%);
 }
 
-.comments {
+.comments_write {
   position: absolute;
   right: 5%;
   top: 10%;
@@ -351,5 +351,16 @@ $maxCaptionHeight: 150px;
   z-index: 11111;
   width: 200px;
   height: 200px;
+  padding: 5px;
+}
+.comments {
+  position: absolute;
+  right: 5%;
+  top: 30%;
+  background: green;
+  color: white;
+  z-index: 11111;
+  width: 200px;
+  min-height: 200px;
   padding: 5px;
 }
