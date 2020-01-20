@@ -249,13 +249,7 @@ class ReactImageLightbox extends Component {
       this.moveRequested = false;
 
       // Load any new images
-      console.log('LB next image', nextProps.mainSrc);
-      console.log('LB current image', this.props.mainSrc);
-      //this.props.comments.commentsList(nextProps.mainSrc);
       this.loadAllImages(nextProps);
-      if (this.props.mainSrc !== nextProps.mainSrc) {
-        this.loadComments(nextProps);
-      }
     }
   }
 
@@ -1094,7 +1088,7 @@ class ReactImageLightbox extends Component {
   }
 
   handleRotateLeft() {
-    const el: any = document.getElementsByClassName('ril-image-current')[0]; // FIXME: this is a hack to get the current lightbox image
+    const el = document.getElementsByClassName('ril-image-current')[0]; // FIXME: this is a hack to get the current lightbox image
     const angle = (this.state.rotationAngle + 90) % 360;
     this.setState({ rotationAngle: angle });
     el.style.transform = `rotate(${angle}deg)`;
@@ -1174,6 +1168,7 @@ class ReactImageLightbox extends Component {
   }
 
   loadComments(props) {
+    console.log('loadComments ', props);
     const comments = props.comments.getCommentsByDefectImage(
       props.comments.comments,
       props.item.id,
@@ -1296,11 +1291,11 @@ class ReactImageLightbox extends Component {
     // getCommentsByDefectImage: util.getCommentsByDefectImage, addComment: this.props.addComment };
     // const commentsByImage = this.props.comments.getCommentsByDefectImage(this.props.comments.comments, this.props.item.id, this.props.mainSrc);
     const commentsByImage = this.state.comments || [];
-    const ImageComment = this.props.comments.imageComment({
+    /* const ImageComment = this.props.comments.imageComment({
       comments: commentsByImage,
       id: this.props.item.id,
       imageUrl: this.props.mainSrc,
-    });
+    }); */
     // const WriteComment = this.props.comments.writeComment({id: this.props.item.id, showModal: false, title: 'Foo', type: 'defect'});
     const {
       animationDisabled,
