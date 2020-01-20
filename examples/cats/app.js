@@ -68,7 +68,7 @@ const titles = [
 ];
 
 const captions = [
-  'Cat in the snow',
+  'Cat in the snow!',
   '',
   <p>
     .. not in the&nbsp;

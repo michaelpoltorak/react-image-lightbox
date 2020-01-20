@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactImageLightbox, { changeAngle } from './override';
 
+import styles from './style.scss';
+
 /**
  * Class ReactImageLightboxRotate
  */
@@ -17,7 +19,7 @@ class ReactImageLightboxRotate extends Component {
   }
 
   componentDidMount() {
-    // styles._insertCss();
+    styles._insertCss();
   }
 
   changeRotation(angle) {

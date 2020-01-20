@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
+import Draggable from 'react-draggable';
+
 import {
   translate,
   getWindowWidth,
@@ -75,7 +77,7 @@ class ReactImageLightbox extends Component {
 
   constructor(props) {
     super(props);
-
+    // console.log('RIL props ', props);
     this.state = {
       //-----------------------------
       // Animation
@@ -105,6 +107,7 @@ class ReactImageLightbox extends Component {
 
       // image load error for srcType
       loadErrorStatus: {},
+      comments: [],
     };
 
     // Refs
@@ -246,7 +249,13 @@ class ReactImageLightbox extends Component {
       this.moveRequested = false;
 
       // Load any new images
+      console.log('LB next image', nextProps.mainSrc);
+      console.log('LB current image', this.props.mainSrc);
+      //this.props.comments.commentsList(nextProps.mainSrc);
       this.loadAllImages(nextProps);
+      if (this.props.mainSrc !== nextProps.mainSrc) {
+        this.loadComments(nextProps);
+      }
     }
   }
 
@@ -1084,6 +1093,13 @@ class ReactImageLightbox extends Component {
     }
   }
 
+  handleRotateLeft() {
+    const el: any = document.getElementsByClassName('ril-image-current')[0]; // FIXME: this is a hack to get the current lightbox image
+    const angle = (this.state.rotationAngle + 90) % 360;
+    this.setState({ rotationAngle: angle });
+    el.style.transform = `rotate(${angle}deg)`;
+  }
+
   handleCaptionMousewheel(event) {
     event.stopPropagation();
 
@@ -1157,6 +1173,17 @@ class ReactImageLightbox extends Component {
     inMemoryImage.src = imageSrc;
   }
 
+  loadComments(props) {
+    const comments = props.comments.getCommentsByDefectImage(
+      props.comments.comments,
+      props.item.id,
+      props.mainSrc
+    );
+    this.setState({ comments });
+    // console.log('Image comments ', comments);
+    console.log('load comments for image ', props.mainSrc);
+    this.props.comments.setCurrentImage(props.mainSrc);
+  }
   // Load all images and their thumbnails
   loadAllImages(props = this.props) {
     const generateLoadDoneCallback = (srcType, imageSrc) => err => {
@@ -1264,6 +1291,17 @@ class ReactImageLightbox extends Component {
   }
 
   render() {
+    // console.log('this.props.comments ', this.props);
+    //  const commentsLB = { imageComment: ImageComment, comments: this.state.commentsData, writeComment,
+    // getCommentsByDefectImage: util.getCommentsByDefectImage, addComment: this.props.addComment };
+    // const commentsByImage = this.props.comments.getCommentsByDefectImage(this.props.comments.comments, this.props.item.id, this.props.mainSrc);
+    const commentsByImage = this.state.comments || [];
+    const ImageComment = this.props.comments.imageComment({
+      comments: commentsByImage,
+      id: this.props.item.id,
+      imageUrl: this.props.mainSrc,
+    });
+    // const WriteComment = this.props.comments.writeComment({id: this.props.item.id, showModal: false, title: 'Foo', type: 'defect'});
     const {
       animationDisabled,
       animationDuration,
@@ -1286,7 +1324,6 @@ class ReactImageLightbox extends Component {
       isClosing,
       loadErrorStatus,
     } = this.state;
-
     const boxSize = this.getLightboxRect();
     let transitionStyle = {};
 
@@ -1307,7 +1344,7 @@ class ReactImageLightbox extends Component {
     // Images to be displayed
     const images = [];
     const addImage = (srcType, imageClass, transforms) => {
-      // Ignore types that have no source defined for their full size image
+      // Ignore types that have no source defined for tx$heir full size image
       if (!this.props[srcType]) {
         return;
       }
@@ -1441,7 +1478,7 @@ class ReactImageLightbox extends Component {
         ...reactModalStyle.content, // Allow style overrides via props
       },
     };
-
+    // const ImageComment = this.props.comments.imageComment({imageId: this.props.mainSrc});
     return (
       <Modal
         isOpen
@@ -1489,6 +1526,9 @@ class ReactImageLightbox extends Component {
             onClick={clickOutsideToClose ? this.closeIfClickInner : undefined}
           >
             {images}
+            <Draggable cancel=".writeComment">
+              <div className="ril__comments">{this.props.imageInfo}</div>
+            </Draggable>
           </div>
 
           {prevSrc && (
@@ -1515,11 +1555,22 @@ class ReactImageLightbox extends Component {
             className="ril-toolbar ril__toolbar"
           >
             <ul className="ril-toolbar-left ril__toolbarSide ril__toolbarLeftSide">
-              <li className="ril-toolbar__item ril__toolbarItem">
+              <li className={`ril-toolbar__item`}>
+                <button // Lightbox back button - i.e. same as close
+                  type="button"
+                  key="back_to_close"
+                  // aria-label={this.props.backToCloseLabel}
+                  className="ril__backButton ril-toolbar__item__child"
+                  onClick={!this.isAnimating() ? this.requestClose : undefined} // Ignore clicks during animation
+                >
+                  ‹ Back
+                </button>
+              </li>
+              {/* <li className="ril-toolbar__item ril__toolbarItem">
                 <span className="ril-toolbar__item__child ril__toolbarItemChild">
                   {imageTitle}
                 </span>
-              </li>
+              </li> */}
             </ul>
 
             <ul className="ril-toolbar-right ril__toolbarSide ril__toolbarRightSide">
@@ -1599,6 +1650,7 @@ class ReactImageLightbox extends Component {
                 />
               </li>
             </ul>
+            <div className="imageTitle">{imageTitle}</div>
           </div>
 
           {this.props.imageCaption && (
